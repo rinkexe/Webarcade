@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Space Runner</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    :root {
+      --bg1: #050816;
+      --bg2: #111827;
+      --accent: #38bdf8;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, #1e293b 0, transparent 45%),
+        radial-gradient(circle at bottom right, #0f172a 0, transparent 45%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .wrapper {
+      width: 100%;
+      max-width: 1000px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(16px);
+      border-radius: 24px;
+      padding: 1.8rem 2rem 2.2rem;
+      box-shadow:
+        0 30px 80px rgba(0, 0, 0, 0.85),
+        0 0 0 1px rgba(148, 163, 184, 0.3);
+      position: relative;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.2rem;
+    }
+
+    .logo {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .logo span {
+      color: var(--accent);
+    }
+
+    .meta-text {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-align: right;
+    }
+
+    .meta-text span {
+      color: var(--accent);
+    }
+
+    .canvas-wrap {
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(248, 250, 252, 0.2);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.03),
+        0 24px 60px rgba(15, 23, 42, 0.8);
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      background: radial-gradient(circle at top, #020617 0, #020617 55%, #020617 100%);
+    }
+
+    /* Overlay for end-of-round controls */
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at center, rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.98));
+      backdrop-filter: blur(18px);
+      z-index: 10;
+    }
+
+    .overlay.hidden {
+      display: none;
+    }
+
+    .overlay-card {
+      width: 100%;
+      max-width: 380px;
+      padding: 1.6rem 1.75rem 1.8rem;
+      border-radius: 18px;
+      background: linear-gradient(145deg, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.9));
+      border: 1px solid rgba(248, 250, 252, 0.2);
+      box-shadow:
+        0 24px 60px rgba(0, 0, 0, 0.95),
+        0 0 0 1px rgba(15, 23, 42, 0.8);
+    }
+
+    .overlay-card h2 {
+      font-size: 1.15rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .overlay-card p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 1.1rem;
+    }
+
+    .score-display {
+      font-size: 0.95rem;
+      margin-bottom: 1.1rem;
+    }
+
+    .score-display span {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .speed-control {
+      margin-bottom: 1.3rem;
+    }
+
+    .speed-control label {
+      display: block;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      margin-bottom: 0.45rem;
+    }
+
+    .speed-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .speed-row input[type="range"] {
+      flex: 1;
+      accent-color: var(--accent);
+    }
+
+    .speed-value {
+      font-size: 0.85rem;
+      color: var(--accent);
+      min-width: 3.2rem;
+      text-align: right;
+    }
+
+    .overlay-card button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      width: 100%;
+      padding: 0.7rem 1rem;
+      border-radius: 999px;
+      border: 1px solid rgba(248, 250, 252, 0.7);
+      background: radial-gradient(circle at top, #020617 0, #020617 55%, #020617 100%);
+      color: var(--text-main);
+      font-size: 0.9rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+      box-shadow:
+        0 14px 30px rgba(0, 0, 0, 0.9),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    }
+
+    .overlay-card button:hover {
+      transform: translateY(-1px);
+      border-color: #ffffff;
+      box-shadow:
+        0 18px 40px rgba(0, 0, 0, 0.95),
+        inset 0 1px 0 rgba(255, 255, 255, 0.07);
+      background: radial-gradient(circle at top, #020617 0, #020617 65%, #020617 100%);
+    }
+
+    .overlay-card button span {
+      font-size: 1rem;
+    }
+
+    @media (max-width: 700px) {
+      .wrapper {
+        padding: 1.4rem 1.4rem 1.6rem;
+      }
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.4rem;
+      }
+      .meta-text {
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <header>
+      <div class="logo">GAME<span>HUB</span></div>
+      <div class="meta-text">
+        Space Runner • Move with <span>A / D</span> or <span>← / →</span>. Press <span>Space</span> to start.
+      </div>
+    </header>
+
+    <div class="canvas-wrap">
+      <canvas id="gameCanvas" width="800" height="450"></canvas>
+    </div>
+
+    <!-- End-of-round overlay with speed control -->
+    <div id="gameOverlay" class="overlay hidden">
+      <div class="overlay-card">
+        <h2>Round over</h2>
+        <p>You collided with debris. Adjust the speed and jump back in.</p>
+
+        <div class="score-display">
+          Score: <span id="finalScore">0</span>
+        </div>
+
+        <div class="speed-control">
+          <label for="speedSlider">Game speed</label>
+          <div class="speed-row">
+            <input id="speedSlider" type="range" min="1" max="5" step="0.5" value="2">
+            <div class="speed-value"><span id="speedLabel">2.0x</span></div>
+          </div>
+        </div>
+
+        <button id="playAgain">
+          Play Again
+          <span>→</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const canvas = document.getElementById("gameCanvas");
+      const ctx = canvas.getContext("2d");
+
+      const overlay = document.getElementById("gameOverlay");
+      const finalScoreEl = document.getElementById("finalScore");
+      const speedSlider = document.getElementById("speedSlider");
+      const speedLabel = document.getElementById("speedLabel");
+      const playAgainBtn = document.getElementById("playAgain");
+
+      const GAME_WIDTH = canvas.width;
+      const GAME_HEIGHT = canvas.height;
+
+      const keys = { left: false, right: false };
+
+      let gameSpeed = parseFloat(speedSlider.value) || 2.0;
+      let state = "start"; // "start" | "running" | "gameover"
+
+      let stars = [];
+      let obstacles = [];
+      let score = 0;
+      let spawnTimer = 0;
+
+      const player = {
+        width: 40,
+        height: 50,
+        x: GAME_WIDTH / 2 - 20,
+        y: GAME_HEIGHT - 80,
+        baseSpeed: 0.45 // px per ms
+      };
+
+      function refreshSpeedLabel() {
+        speedLabel.textContent = gameSpeed.toFixed(1) + "x";
+      }
+      refreshSpeedLabel();
+
+      speedSlider.addEventListener("input", () => {
+        gameSpeed = parseFloat(speedSlider.value) || 1;
+        refreshSpeedLabel();
+      });
+
+      function initStars() {
+        stars = [];
+        const count = 70;
+        for (let i = 0; i < count; i++) {
+          stars.push({
+            x: Math.random() * GAME_WIDTH,
+            y: Math.random() * GAME_HEIGHT,
+            size: Math.random() * 2 + 0.5,
+            speed: Math.random() * 0.4 + 0.3
+          });
+        }
+      }
+
+      function spawnObstacle() {
+        const width = Math.random() * 40 + 40;
+        const height = Math.random() * 20 + 20;
+        const x = Math.random() * (GAME_WIDTH - width);
+        obstacles.push({
+          x,
+          y: -height,
+          width,
+          height
+        });
+      }
+
+      function resetGame() {
+        score = 0;
+        spawnTimer = 0;
+        obstacles = [];
+        initStars();
+        player.x = GAME_WIDTH / 2 - player.width / 2;
+      }
+
+      function startGame() {
+        resetGame();
+        overlay.classList.add("hidden");
+        state = "running";
+      }
+
+      function setGameOver() {
+        state = "gameover";
+        finalScoreEl.textContent = Math.floor(score);
+        overlay.classList.remove("hidden");
+      }
+
+      document.addEventListener("keydown", (e) => {
+        if (e.code === "ArrowLeft" || e.code === "KeyA") {
+          keys.left = true;
+        } else if (e.code === "ArrowRight" || e.code === "KeyD") {
+          keys.right = true;
+        } else if (e.code === "Space") {
+          if (state === "start") {
+            startGame();
+          } else if (state === "gameover") {
+            // speed already set via slider
+            startGame();
+          }
+          e.preventDefault();
+        }
+      });
+
+      document.addEventListener("keyup", (e) => {
+        if (e.code === "ArrowLeft" || e.code === "KeyA") {
+          keys.left = false;
+        } else if (e.code === "ArrowRight" || e.code === "KeyD") {
+          keys.right = false;
+        }
+      });
+
+      playAgainBtn.addEventListener("click", () => {
+        gameSpeed = parseFloat(speedSlider.value) || 1;
+        refreshSpeedLabel();
+        startGame();
+      });
+
+      function rectsOverlap(a, b) {
+        return !(
+          a.x + a.width < b.x ||
+          a.x > b.x + b.width ||
+          a.y + a.height < b.y ||
+          a.y > b.y + b.height
+        );
+      }
+
+      function update(delta) {
+        if (state !== "running") return;
+
+        // stars
+        const starBase = 0.03;
+        for (const star of stars) {
+          star.y += delta * starBase * star.speed * gameSpeed;
+          if (star.y > GAME_HEIGHT) {
+            star.y = -star.size;
+            star.x = Math.random() * GAME_WIDTH;
+          }
+        }
+
+        // player movement
+        const move = player.baseSpeed * delta * gameSpeed;
+        if (keys.left) player.x -= move;
+        if (keys.right) player.x += move;
+        if (player.x < 0) player.x = 0;
+        if (player.x + player.width > GAME_WIDTH) {
+          player.x = GAME_WIDTH - player.width;
+        }
+
+        // spawn obstacles
+        spawnTimer += delta;
+        const spawnInterval = 900 / gameSpeed; // faster with higher speed
+        if (spawnTimer >= spawnInterval) {
+          spawnObstacle();
+          spawnTimer = 0;
+        }
+
+        // move obstacles
+        const obstacleSpeed = 0.18 * gameSpeed; // px per ms
+        for (const obs of obstacles) {
+          obs.y += obstacleSpeed * delta;
+        }
+
+        // remove off-screen
+        obstacles = obstacles.filter((obs) => obs.y <= GAME_HEIGHT + obs.height);
+
+        // collisions
+        for (const obs of obstacles) {
+          if (rectsOverlap(
+            { x: player.x, y: player.y, width: player.width, height: player.height },
+            obs
+          )) {
+            setGameOver();
+            return;
+          }
+        }
+
+        // score
+        score += delta * gameSpeed * 0.02; // scaled by speed
+      }
+
+      function draw() {
+        // background gradient
+        const gradient = ctx.createLinearGradient(0, 0, 0, GAME_HEIGHT);
+        gradient.addColorStop(0, "#020617");
+        gradient.addColorStop(1, "#020617");
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+        // subtle horizon glow
+        const glow = ctx.createRadialGradient(
+          GAME_WIDTH / 2, GAME_HEIGHT, 0,
+          GAME_WIDTH / 2, GAME_HEIGHT, GAME_HEIGHT * 0.75
+        );
+        glow.addColorStop(0, "rgba(56, 189, 248, 0.16)");
+        glow.addColorStop(1, "rgba(15, 23, 42, 0)");
+        ctx.fillStyle = glow;
+        ctx.fillRect(0, GAME_HEIGHT * 0.35, GAME_WIDTH, GAME_HEIGHT * 0.65);
+
+        // stars
+        ctx.fillStyle = "rgba(148, 163, 184, 0.9)";
+        for (const star of stars) {
+          ctx.fillRect(star.x, star.y, star.size, star.size);
+        }
+
+        // player ship
+        ctx.save();
+        ctx.translate(player.x + player.width / 2, player.y + player.height / 2);
+
+        // engine glow
+        const engineGradient = ctx.createRadialGradient(0, player.height / 2, 0, 0, player.height / 2, 30);
+        engineGradient.addColorStop(0, "rgba(56, 189, 248, 0.7)");
+        engineGradient.addColorStop(1, "rgba(56, 189, 248, 0)");
+        ctx.fillStyle = engineGradient;
+        ctx.beginPath();
+        ctx.ellipse(0, player.height / 2 + 6, 10, 20, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // body
+        ctx.fillStyle = "#38bdf8";
+        ctx.beginPath();
+        ctx.moveTo(0, -player.height / 2); // top
+        ctx.lineTo(-player.width / 2, player.height / 2); // bottom left
+        ctx.lineTo(player.width / 2, player.height / 2); // bottom right
+        ctx.closePath();
+        ctx.fill();
+
+        // cockpit
+        ctx.fillStyle = "#e5e7eb";
+        ctx.beginPath();
+        ctx.arc(0, -player.height / 4, 8, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+
+        // obstacles
+        for (const obs of obstacles) {
+          const obsGrad = ctx.createLinearGradient(obs.x, obs.y, obs.x, obs.y + obs.height);
+          obsGrad.addColorStop(0, "#0ea5e9");
+          obsGrad.addColorStop(1, "#1e3a8a");
+          ctx.fillStyle = obsGrad;
+          ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+
+          ctx.strokeStyle = "rgba(15, 23, 42, 0.9)";
+          ctx.lineWidth = 2;
+          ctx.strokeRect(obs.x + 1, obs.y + 1, obs.width - 2, obs.height - 2);
+        }
+
+        // HUD
+        ctx.fillStyle = "#e5e7eb";
+        ctx.font = "16px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText("Score: " + Math.floor(score), 16, 26);
+
+        ctx.fillStyle = "rgba(148, 163, 184, 0.9)";
+        ctx.font = "13px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+        ctx.fillText("Speed: " + gameSpeed.toFixed(1) + "x", 16, 46);
+
+        if (state === "start") {
+          ctx.fillStyle = "rgba(15, 23, 42, 0.7)";
+          ctx.fillRect(GAME_WIDTH / 2 - 180, GAME_HEIGHT / 2 - 50, 360, 100);
+
+          ctx.strokeStyle = "rgba(148, 163, 184, 0.8)";
+          ctx.strokeRect(GAME_WIDTH / 2 - 180, GAME_HEIGHT / 2 - 50, 360, 100);
+
+          ctx.textAlign = "center";
+          ctx.fillStyle = "#e5e7eb";
+          ctx.font = "18px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+          ctx.fillText("Press Space to start", GAME_WIDTH / 2, GAME_HEIGHT / 2 - 6);
+          ctx.font = "13px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+          ctx.fillStyle = "rgba(156, 163, 175, 0.9)";
+          ctx.fillText("Move with A / D or Arrow keys", GAME_WIDTH / 2, GAME_HEIGHT / 2 + 18);
+        }
+
+        if (state === "gameover") {
+          // dim center behind overlay for continuity
+          ctx.fillStyle = "rgba(15, 23, 42, 0.35)";
+          ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+        }
+      }
+
+      let lastTime = performance.now();
+
+      function loop(timestamp) {
+        const delta = timestamp - lastTime;
+        lastTime = timestamp;
+        update(delta);
+        draw();
+        requestAnimationFrame(loop);
+      }
+
+      initStars();
+      requestAnimationFrame(loop);
+    })();
+  </script>
+</body>
+</html>

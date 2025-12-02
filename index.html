@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Game Hub | Dark Mode Game Website</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg1: #050816;
+      --bg2: #111827;
+      --accent: #38bdf8;
+      --panel-bg: #020617;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --border: #f9fafb;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      color: var(--text-main);
+      background: radial-gradient(circle at top left, #1e293b 0, transparent 45%),
+                  radial-gradient(circle at bottom right, #0f172a 0, transparent 45%),
+                  linear-gradient(135deg, var(--bg1), var(--bg2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .wrapper {
+      width: 100%;
+      max-width: 1100px;
+      border-radius: 24px;
+      padding: 2.5rem;
+      backdrop-filter: blur(16px);
+      background: linear-gradient(
+          135deg,
+          rgba(148, 163, 184, 0.12),
+          rgba(15, 23, 42, 0.9)
+        );
+      box-shadow:
+        0 30px 80px rgba(15, 23, 42, 0.9),
+        0 0 0 1px rgba(148, 163, 184, 0.25);
+    }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 1.25rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-main);
+    }
+
+    .logo span {
+      color: var(--accent);
+    }
+
+    nav {
+      display: flex;
+      gap: 0.75rem;
+      font-size: 0.9rem;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: var(--text-muted);
+      padding: 0.4rem 0.8rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      transition: color 0.25s ease, border-color 0.25s ease,
+        background-color 0.25s ease;
+    }
+
+    nav a:hover {
+      color: var(--text-main);
+      border-color: rgba(148, 163, 184, 0.6);
+      background-color: rgba(15, 23, 42, 0.7);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1.4fr);
+      gap: 2rem;
+      align-items: flex-start;
+    }
+
+    @media (max-width: 900px) {
+      .hero {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .hero-text h1 {
+      font-size: clamp(2.2rem, 3vw + 1.5rem, 3.3rem);
+      line-height: 1.1;
+      margin-bottom: 0.75rem;
+    }
+
+    .hero-text h1 span {
+      background-image: linear-gradient(120deg, #38bdf8, #a855f7);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .hero-text p {
+      font-size: 0.98rem;
+      line-height: 1.6;
+      color: var(--text-muted);
+      max-width: 32rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.85rem;
+    }
+
+    .hero-actions a.primary {
+      text-decoration: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 999px;
+      border: 1px solid rgba(248, 250, 252, 0.4);
+      background: linear-gradient(135deg, #0f172a, #020617);
+      color: var(--text-main);
+      font-size: 0.95rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease,
+        background 0.2s ease, border-color 0.2s ease;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.8);
+    }
+
+    .hero-actions a.primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.95);
+      background: linear-gradient(135deg, #020617, #020617);
+      border-color: var(--border);
+    }
+
+    .hero-actions a.secondary {
+      text-decoration: none;
+      padding: 0.75rem 1.3rem;
+      border-radius: 999px;
+      border: 1px dashed rgba(148, 163, 184, 0.7);
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: border-color 0.2s ease, color 0.2s ease,
+        background-color 0.2s ease;
+    }
+
+    .hero-actions a.secondary:hover {
+      border-color: var(--accent);
+      color: var(--text-main);
+      background-color: rgba(15, 23, 42, 0.6);
+    }
+
+    /* Panel buttons (games) */
+
+    .panel-grid {
+      display: grid;
+      gap: 1.2rem;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @media (max-width: 900px) {
+      .panel-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .panel-button {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 1.2rem 1.3rem;
+      border-radius: 18px;
+      text-decoration: none;
+      cursor: pointer;
+
+      /* white outline */
+      border: 1px solid rgba(249, 250, 251, 0.9);
+
+      /* dark inside */
+      background: radial-gradient(circle at top, #020617, #020617 40%, #020617);
+
+      /* subtle inner gradient highlight */
+      box-shadow:
+        inset 0 1px 0 rgba(248, 250, 252, 0.05),
+        0 18px 35px rgba(15, 23, 42, 0.95);
+      overflow: hidden;
+
+      transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        border-color 0.18s ease,
+        background 0.18s ease;
+    }
+
+    .panel-button::before {
+      content: "";
+      position: absolute;
+      inset: -30%;
+      background: radial-gradient(
+        circle at top,
+        rgba(56, 189, 248, 0.25),
+        transparent 55%
+      );
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.22s ease, transform 0.22s ease;
+      pointer-events: none;
+    }
+
+    .panel-button:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow:
+        inset 0 1px 0 rgba(248, 250, 252, 0.1),
+        0 26px 55px rgba(15, 23, 42, 0.98);
+      border-color: #ffffff;
+      background: radial-gradient(
+        circle at top,
+        #020617,
+        #020617 50%,
+        #020617
+      );
+    }
+
+    .panel-button:hover::before {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .panel-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: rgba(209, 213, 219, 0.7);
+      margin-bottom: 0.5rem;
+    }
+
+    .panel-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+    }
+
+    .panel-text {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      max-width: 20rem;
+    }
+
+    .panel-meta {
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      color: rgba(148, 163, 184, 0.9);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.65);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+  </style>
+</head>
+<body>
+  <main class="wrapper">
+    <header>
+      <div class="logo">
+        GAME<span>HUB</span>
+      </div>
+      <nav>
+        <a href="#">Home</a>
+        <a href="#">All Games</a>
+        <a href="#">Top Rated</a>
+        <a href="#">About</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="hero-text">
+        <h1>
+          Play in <span>dark mode</span>.
+          All your games in one clean hub.
+        </h1>
+        <p>
+          This home page automatically lists games from a JSON file and shows
+          them as animated dark panels. Click any game card to launch it.
+        </p>
+        <div class="hero-actions">
+          <a href="#games" class="primary">
+            Browse Games
+            <span>→</span>
+          </a>
+          <a href="#" class="secondary">
+            How it works
+          </a>
+        </div>
+      </div>
+
+      <!-- Dynamic games list -->
+      <div id="games" class="panel-grid"></div>
+    </section>
+  </main>
+
+  <!-- Example JSON data for games (you can move this to games.json if you want) -->
+  <script id="game-data" type="application/json">
+  [
+    {
+      "id": "space-runner",
+      "title": "Space Runner",
+      "genre": "Arcade",
+      "players": "1",
+      "status": "Online",
+      "difficulty": "Medium",
+      "url": "games/space-runner/index.html",
+      "description": "Dash through asteroid fields, dodge enemies, and collect energy orbs."
+    },
+    {
+      "id": "pixel-snake",
+      "title": "Pixel Snake",
+      "genre": "Classic",
+      "players": "1",
+      "status": "Online",
+      "difficulty": "Easy",
+      "url": "games/pixel-snake/index.html",
+      "description": "Grow your snake, avoid crashing, and chase the highest score."
+    },
+    {
+      "id": "neon-racers",
+      "title": "Neon Racers",
+      "genre": "Racing",
+      "players": "1–2",
+      "status": "Beta",
+      "difficulty": "Hard",
+      "url": "games/neon-racers/index.html",
+      "description": "Race through glowing city streets with tight corners and tight timers."
+    },
+    {
+      "id": "tower-defense",
+      "title": "Core Defense",
+      "genre": "Strategy",
+      "players": "1",
+      "status": "Online",
+      "difficulty": "Medium",
+      "url": "games/core-defense/index.html",
+      "description": "Place towers, plan your routes, and defend the core from enemy waves."
+    },
+    {
+      "id": "memory-flip",
+      "title": "Memory Flip",
+      "genre": "Puzzle",
+      "players": "1",
+      "status": "Online",
+      "difficulty": "Easy",
+      "url": "games/memory-flip/index.html",
+      "description": "Flip cards, match pairs, and test how sharp your memory is."
+    },
+    {
+      "id": "block-drop",
+      "title": "Block Drop",
+      "genre": "Puzzle",
+      "players": "1",
+      "status": "Offline",
+      "difficulty": "Hard",
+      "url": "games/block-drop/index.html",
+      "description": "Rotate falling blocks and clear full lines before the stack reaches the top."
+    }
+  ]
+  </script>
+
+  <script>
+    // If you want to load from an external JSON file instead, replace this
+    // part with a fetch("games.json").then(res => res.json())...
+    const raw = document.getElementById("game-data").textContent.trim();
+    const games = JSON.parse(raw);
+
+    const grid = document.getElementById("games");
+
+    games.forEach(game => {
+      const a = document.createElement("a");
+      a.className = "panel-button";
+      a.href = game.url;
+      a.target = "_blank"; // open game in new tab; remove if you want same tab
+      a.rel = "noopener noreferrer";
+
+      a.innerHTML = `
+        <div>
+          <div class="panel-label">Game • ${game.id}</div>
+          <div class="panel-title">${game.title}</div>
+          <p class="panel-text">
+            ${game.description}
+          </p>
+        </div>
+        <div class="panel-meta">
+          <span class="pill">${game.genre}</span>
+          <span class="pill">${game.players} Player${game.players === "1" ? "" : "s"}</span>
+          <span>${game.status} · ${game.difficulty}</span>
+        </div>
+      `;
+
+      grid.appendChild(a);
+    });
+  </script>
+</body>
+</html>
